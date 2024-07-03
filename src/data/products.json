@@ -1,0 +1,30 @@
+[
+  {
+    "id": "4bcbb1f1-7ce3-49d5-9f2b-3a2622cf2a87",
+    "title": "Producto Actualizado",
+    "description": "Descripción actualizada",
+    "code": "NP123",
+    "price": 200,
+    "status": true,
+    "stock": 50,
+    "category": "Categoría Actualizada",
+    "thumbnails": [
+      "ruta1.jpg",
+      "ruta2.jpg"
+    ]
+  },
+  {
+    "id": "5e6d36c3-1115-4fe1-9e4d-3e60bf7efc2f",
+    "title": "produdctTest",
+    "description": "Descripción del nuevo producto1",
+    "code": "NP1231",
+    "price": 151,
+    "status": true,
+    "stock": 30,
+    "category": "Categoría 1",
+    "thumbnails": [
+      "ruta2.jpg",
+      "ruta3.jpg"
+    ]
+  }
+]
