@@ -34,7 +34,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
         const cartId = req.params.cid;
         const productId = req.params.pid;
 
-  
+        
         const product = await productManager.getProductById(productId);
         if (!product) {
             return res.status(404).json({ error: 'Producto no encontrado' });
@@ -48,6 +48,20 @@ router.post('/:cid/product/:pid', async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ error: 'Error al agregar el producto al carrito' });
+    }
+});
+
+router.delete('/:cid', async (req, res) => {
+    try {
+        const cartId = req.params.cid;
+        const deletedCart = await cartManager.deleteCart(cartId);
+        if (deletedCart) {
+            res.json({ message: 'Carrito eliminado', cart: deletedCart });
+        } else {
+            res.status(404).json({ error: 'Carrito no encontrado' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar el carrito' });
     }
 });
 

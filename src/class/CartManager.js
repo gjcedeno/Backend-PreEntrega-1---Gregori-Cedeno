@@ -1,5 +1,4 @@
 import fs from 'fs/promises';
-import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { __dirname } from '../utils.js';
 
@@ -11,7 +10,7 @@ class CartManager {
     async createCart() {
         try {
             const carts = await this._readCarts();
-            const newCart = { id: uuidv4(), products: [] };
+            const newCart = { id: carts.length ? Math.max(...carts.map(c => c.id)) + 1 : 1, products: [] };
             carts.push(newCart);
             await this._writeCarts(carts);
             return newCart;
@@ -24,7 +23,7 @@ class CartManager {
     async getCartById(id) {
         try {
             const carts = await this._readCarts();
-            return carts.find(cart => cart.id === id);
+            return carts.find(cart => cart.id === Number(id));
         } catch (error) {
             console.error('Error al obtener el carrito:', error);
             throw new Error('No se pudo obtener el carrito');
@@ -34,7 +33,7 @@ class CartManager {
     async addProductToCart(cartId, productId) {
         try {
             const carts = await this._readCarts();
-            const cart = carts.find(cart => cart.id === cartId);
+            const cart = carts.find(cart => cart.id === Number(cartId));
             if (!cart) {
                 return null;
             }
@@ -51,6 +50,22 @@ class CartManager {
         } catch (error) {
             console.error('Error al agregar el producto al carrito:', error);
             throw new Error('No se pudo agregar el producto al carrito');
+        }
+    }
+
+    async deleteCart(id) {
+        try {
+            const carts = await this._readCarts();
+            const index = carts.findIndex(cart => cart.id === Number(id));
+            if (index === -1) {
+                return null;
+            }
+            const deletedCart = carts.splice(index, 1)[0];
+            await this._writeCarts(carts);
+            return deletedCart;
+        } catch (error) {
+            console.error('Error al eliminar el carrito:', error);
+            throw new Error('No se pudo eliminar el carrito');
         }
     }
 

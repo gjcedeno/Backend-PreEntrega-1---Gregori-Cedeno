@@ -1,5 +1,4 @@
 import fs from 'fs/promises';
-import { v4 as uuidv4 } from 'uuid'; 
 import path from 'path';
 import { __dirname } from '../utils.js';
 
@@ -21,7 +20,7 @@ class ProductManager {
     async getProductById(id) {
         try {
             const products = await this.getAllProducts();
-            return products.find(product => product.id === id);
+            return products.find(product => product.id === Number(id));
         } catch (error) {
             console.error('Error al obtener el producto:', error);
             throw new Error('No se pudo obtener el producto');
@@ -32,7 +31,7 @@ class ProductManager {
         try {
             const products = await this.getAllProducts();
             const newProduct = {
-                id: uuidv4(),
+                id: products.length ? Math.max(products.map(p => p.id)) + 1 : 1,
                 title,
                 description,
                 code,
@@ -54,7 +53,7 @@ class ProductManager {
     async updateProduct(id, updatedFields) {
         try {
             const products = await this.getAllProducts();
-            const index = products.findIndex(product => product.id === id);
+            const index = products.findIndex(product => product.id === Number(id));
             if (index === -1) {
                 return null;
             }
@@ -72,7 +71,7 @@ class ProductManager {
     async deleteProduct(id) {
         try {
             const products = await this.getAllProducts();
-            const index = products.findIndex(product => product.id === id);
+            const index = products.findIndex(product => product.id === Number(id));
             if (index === -1) {
                 return null;
             }
