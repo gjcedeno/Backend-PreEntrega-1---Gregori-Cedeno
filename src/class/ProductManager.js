@@ -10,7 +10,9 @@ class ProductManager {
     async getAllProducts() {
         try {
             const data = await fs.readFile(this.path, 'utf-8');
-            return JSON.parse(data);
+            const products = JSON.parse(data);
+            console.log('Productos cargados:', products); // Para depuración
+            return products;
         } catch (error) {
             console.error('Error al leer los productos:', error);
             throw new Error('No se pudo leer la base de datos de productos');
@@ -27,11 +29,12 @@ class ProductManager {
         }
     }
 
-    async addProduct({ title, description, code, price, status, stock, category, thumbnails }) {
+    async addProduct({ title, description, code, price, status = true, stock, category, thumbnails = [] }) {
         try {
             const products = await this.getAllProducts();
+            const maxId = products.length ? Math.max(...products.map(p => p.id)) : 0;
             const newProduct = {
-                id: products.length ? Math.max(products.map(p => p.id)) + 1 : 1,
+                id: maxId + 1,
                 title,
                 description,
                 code,

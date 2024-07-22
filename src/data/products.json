@@ -1,30 +1,57 @@
 [
   {
     "id": 1,
-    "title": "Producto de prueba",
-    "description": "Descripción del producto de prueba",
-    "code": "PRD123",
-    "price": 100,
+    "title": "Camiseta Marvel",
+    "description": "Camiseta con diseño de Marvel",
+    "code": "MV123",
+    "price": "10",
     "status": true,
-    "stock": 10,
-    "category": "Categoría de prueba",
-    "thumbnails": [
-      "url1",
-      "url2"
-    ]
+    "stock": "20",
+    "category": "Películas",
+    "thumbnails": []
   },
   {
     "id": 2,
-    "title": "Producto de prueba2",
-    "description": "Descripción del producto de prueba2",
-    "code": "PRD123",
-    "price": 100,
+    "title": "Camiseta Star Wars",
+    "description": "Camiseta con diseño de Star Wars",
+    "code": "SW123",
+    "price": "15",
     "status": true,
-    "stock": 10,
-    "category": "Categoría de prueba",
-    "thumbnails": [
-      "url3",
-      "url4"
-    ]
+    "stock": "25",
+    "category": "Películas",
+    "thumbnails": []
+  },
+  {
+    "id": 3,
+    "title": "Camiseta Jurassic Park",
+    "description": "Camiseta con diseño de Marvel",
+    "code": "MV123",
+    "price": "10",
+    "status": true,
+    "stock": "20",
+    "category": "Películas",
+    "thumbnails": []
+  },
+  {
+    "id": 4,
+    "title": "Camiseta de Peaky Blinders",
+    "description": " Camiseta con diseño de Peaky blinders",
+    "code": "PB124",
+    "price": "100",
+    "status": true,
+    "stock": "5",
+    "category": "Películas",
+    "thumbnails": []
+  },
+  {
+    "id": 5,
+    "title": "Camiseta de Friends",
+    "description": "Camiseta con diseño de Friends",
+    "code": "FN123",
+    "price": "16",
+    "status": true,
+    "stock": "3",
+    "category": "Películas",
+    "thumbnails": []
   }
 ]
