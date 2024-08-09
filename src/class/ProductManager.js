@@ -1,100 +1,91 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { __dirname } from '../utils.js';
+import Product from '../models/Product.js';
 
 class ProductManager {
-    constructor(relativePath) {
-        this.path = path.join(__dirname, relativePath);
-    }
+  async getAllProducts({ limit = 10, page = 1, sort = 'asc', query = '', category = '', status = '' } = {}) {
+    try {
+      const queryObj = {};
 
-    async getAllProducts() {
-        try {
-            const data = await fs.readFile(this.path, 'utf-8');
-            const products = JSON.parse(data);
-            console.log('Productos cargados:', products); // Para depuración
-            return products;
-        } catch (error) {
-            console.error('Error al leer los productos:', error);
-            throw new Error('No se pudo leer la base de datos de productos');
-        }
-    }
+      // Aplicar filtro de búsqueda general (por título o descripción)
+      if (query) {
+        queryObj.$or = [
+          { title: { $regex: query, $options: 'i' } },
+          { description: { $regex: query, $options: 'i' } }
+        ];
+      }
 
-    async getProductById(id) {
-        try {
-            const products = await this.getAllProducts();
-            return products.find(product => product.id === Number(id));
-        } catch (error) {
-            console.error('Error al obtener el producto:', error);
-            throw new Error('No se pudo obtener el producto');
-        }
-    }
+      // Aplicar filtro de categoría si se especifica
+      if (category) {
+        queryObj.category = category;
+      }
 
-    async addProduct({ title, description, code, price, status = true, stock, category, thumbnails = [] }) {
-        try {
-            const products = await this.getAllProducts();
-            const maxId = products.length ? Math.max(...products.map(p => p.id)) : 0;
-            const newProduct = {
-                id: maxId + 1,
-                title,
-                description,
-                code,
-                price,
-                status,
-                stock,
-                category,
-                thumbnails
-            };
-            products.push(newProduct);
-            await this._writeProducts(products);
-            return newProduct;
-        } catch (error) {
-            console.error('Error al agregar el producto:', error);
-            throw new Error('No se pudo agregar el producto');
-        }
-    }
+      // Aplicar filtro de estado si se especifica
+      if (status) {
+        queryObj.status = status === 'true';
+      }
 
-    async updateProduct(id, updatedFields) {
-        try {
-            const products = await this.getAllProducts();
-            const index = products.findIndex(product => product.id === Number(id));
-            if (index === -1) {
-                return null;
-            }
-            const product = products[index];
-            const updatedProduct = { ...product, ...updatedFields, id: product.id };
-            products[index] = updatedProduct;
-            await this._writeProducts(products);
-            return updatedProduct;
-        } catch (error) {
-            console.error('Error al actualizar el producto:', error);
-            throw new Error('No se pudo actualizar el producto');
-        }
-    }
+      // Ejecutar la consulta con los filtros aplicados
+      const products = await Product.find(queryObj)
+        .limit(Number(limit))
+        .skip((page - 1) * limit)
+        .sort({ price: sort === 'asc' ? 1 : -1 });
 
-    async deleteProduct(id) {
-        try {
-            const products = await this.getAllProducts();
-            const index = products.findIndex(product => product.id === Number(id));
-            if (index === -1) {
-                return null;
-            }
-            const deletedProduct = products.splice(index, 1)[0];
-            await this._writeProducts(products);
-            return deletedProduct;
-        } catch (error) {
-            console.error('Error al eliminar el producto:', error);
-            throw new Error('No se pudo eliminar el producto');
-        }
-    }
+      const totalProducts = await Product.countDocuments(queryObj);
+      const totalPages = Math.ceil(totalProducts / limit);
 
-    async _writeProducts(products) {
-        try {
-            await fs.writeFile(this.path, JSON.stringify(products, null, 2));
-        } catch (error) {
-            console.error('Error al escribir los productos:', error);
-            throw new Error('No se pudo escribir la base de datos de productos');
-        }
+      return {
+        status: 'success',
+        payload: products,
+        totalPages,
+        prevPage: page > 1 ? page - 1 : null,
+        nextPage: page < totalPages ? page + 1 : null,
+        page,
+        hasPrevPage: page > 1,
+        hasNextPage: page < totalPages,
+        prevLink: page > 1 ? `/products?limit=${limit}&page=${page - 1}&sort=${sort}&query=${query}&category=${category}&status=${status}` : null,
+        nextLink: page < totalPages ? `/products?limit=${limit}&page=${page + 1}&sort=${sort}&query=${query}&category=${category}&status=${status}` : null,
+      };
+    } catch (error) {
+      console.error('Error al obtener los productos:', error);
+      throw new Error('No se pudo obtener los productos');
     }
+  }
+
+  async getProductById(id) {
+    try {
+      return await Product.findById(id);
+    } catch (error) {
+      console.error('Error al obtener el producto:', error);
+      throw new Error('No se pudo obtener el producto');
+    }
+  }
+
+  async addProduct(data) {
+    try {
+      const newProduct = new Product(data);
+      return await newProduct.save();
+    } catch (error) {
+      console.error('Error al agregar el producto:', error);
+      throw new Error('No se pudo agregar el producto');
+    }
+  }
+
+  async updateProduct(id, updatedFields) {
+    try {
+      return await Product.findByIdAndUpdate(id, updatedFields, { new: true });
+    } catch (error) {
+      console.error('Error al actualizar el producto:', error);
+      throw new Error('No se pudo actualizar el producto');
+    }
+  }
+
+  async deleteProduct(id) {
+    try {
+      return await Product.findByIdAndDelete(id);
+    } catch (error) {
+      console.error('Error al eliminar el producto:', error);
+      throw new Error('No se pudo eliminar el producto');
+    }
+  }
 }
 
 export default ProductManager;

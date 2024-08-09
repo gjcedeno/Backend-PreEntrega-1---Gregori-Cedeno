@@ -1,0 +1,36 @@
+<h2>{{product.title}}</h2>
+<p>{{product.description}}</p>
+<p>Price: ${{product.price}}</p>
+<p>Category: {{product.category}}</p>
+<p>Status: {{#if product.status}}Available{{else}}Not Available{{/if}}</p>
+<p>Stock: {{product.stock}}</p>
+<button onclick="addToCart('{{product._id}}')">Add to Cart</button>
+
+<script>
+  const cartId = '{{cartId}}';
+
+  function addToCart(productId) {
+    if (!cartId) {
+      alert('Error: Cart ID is missing.');
+      return;
+    }
+
+    fetch(`/api/carts/${cartId}/products/${productId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quantity: 1 })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        alert('Product added to cart');
+      } else {
+        alert('Error adding product to cart');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error adding product to cart');
+    });
+  }
+</script>

@@ -1,0 +1,29 @@
+<h2>My Cart</h2>
+<ul id="cart-products">
+  {{#each cart.products}}
+    <li>{{this.productId.title}} - Quantity: {{this.quantity}}</li>
+  {{/each}}
+</ul>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+  const cartId = '{{cartId}}'; // Asigna el ID del carrito dinámicamente
+
+  fetch(`/api/carts/${cartId}`)
+    .then(response => response.json())
+    .then(data => {
+    
+      if (data.status === 'success') {
+        const productsList = document.getElementById('cart-products');
+        productsList.innerHTML = data.payload.products.map(product => 
+          `<li>${product.productId.title} - Quantity: ${product.quantity}</li>`
+        ).join('');
+      } else {
+        console.error('Error al obtener el carrito:', data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+});
+</script>

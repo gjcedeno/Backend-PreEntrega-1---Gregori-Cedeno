@@ -1,16 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
 </head>
 <body>
-    <h1>Product List</h1>
-    <ul>
-        {{#each products}}
-        <li>{{this.title}} - {{this.description}}</li>
-        {{/each}}
-    </ul>
+  <h2>Product List</h2>
+
+  <!-- Filtro y Ordenamiento -->
+  <form id="filter-form">
+    <input type="text" name="query" placeholder="Search by title or description">
+   <select name="category">
+  <option value="">All Categories</option>
+  <option value="Series">Series</option>
+  <option value="Películas">Películas</option>
+</select>
+    <select name="status">
+      <option value="">All Status</option>
+      <option value="true">Available</option>
+      <option value="false">Not Available</option>
+    </select>
+    <select name="sort">
+      <option value="">No Sorting</option>
+      <option value="asc">Price: Low to High</option>
+      <option value="desc">Price: High to Low</option>
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+
+  <!-- Lista de Productos -->
+  <ul>
+    {{#each products}}
+    <li>
+      <a href="/products/{{this._id}}">{{this.title}}</a> - {{this.description}} - ${{this.price}}
+      <button onclick="addToCart('{{this._id}}')">Add to Cart</button>
+    </li>
+    {{/each}}
+  </ul>
+
+  <!-- Paginación -->
+  <div>
+    {{#if hasPrevPage}}<a href="{{prevLink}}">Previous</a>{{/if}}
+    {{#if hasNextPage}}<a href="{{nextLink}}">Next</a>{{/if}}
+  </div>
+
+  <script>
+    const cartId = '{{cartId}}';
+
+    function addToCart(productId) {
+      if (!cartId) {
+        alert('Error: Cart ID is missing.');
+        return;
+      }
+
+      fetch(`/api/carts/${cartId}/products/${productId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: 1 })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          alert('Product added to cart');
+        } else {
+          alert('Error adding product to cart');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding product to cart');
+      });
+    }
+
+    // Manejar el envío del formulario para aplicar los filtros
+    document.getElementById('filter-form').addEventListener('submit', function(event) {
+  event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
+
+  const query = this.query.value;
+  const category = this.category.value;
+  const status = this.status.value;
+  const sort = this.sort.value;
+
+  // Construir la URL de la consulta
+  let url = '/products?';
+  if (query) url += `query=${encodeURIComponent(query)}&`;
+  if (category) url += `category=${encodeURIComponent(category)}&`;
+  if (status) url += `status=${encodeURIComponent(status)}&`;
+  if (sort) url += `sort=${encodeURIComponent(sort)}&`;
+
+  // Redirigir a la URL con los parámetros de consulta
+  window.location.href = url;
+});
+  </script>
 </body>
 </html>
